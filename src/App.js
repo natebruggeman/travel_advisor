@@ -6,6 +6,7 @@ import { getPlacesData } from "./api/index.js";
 import Header from "./components/Header/Header";
 import List from "./components/List/List";
 import Map from "./components/Map/Map";
+import PlaceDetails from "./components/PlaceDetails/PlaceDetails.jsx";
 
 const App = () => {
   const [places, setPlaces] = useState([]);
@@ -24,10 +25,7 @@ const App = () => {
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
-        console.log(coords);
-        console.log({ latitude, longitude });
         setCoordinates({ lat: latitude, lng: longitude });
-        console.log({ setCoordinates });
       }
     );
   }, []);
@@ -40,18 +38,20 @@ const App = () => {
 
   //useEffect for altering type of restaruant, attraction, or hotel
   useEffect(() => {
-    setIsLoading(true);
-    getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
-      setPlaces(data);
-      setFilteredPlaces([]);
-      setIsLoading(false);
-    });
-  }, [type, coords, bounds]);
+    if (bounds.sw && bounds.ne) {
+      setIsLoading(true);
+      getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
+        setPlaces(data?.filter((place) => place.name && place.num_reviews > 0));
+        setFilteredPlaces([]);
+        setIsLoading(false);
+      });
+    }
+  }, [type, bounds]);
 
   return (
     <>
       <CssBaseline />
-      <Header />
+      <Header setCoordinates={setCoordinates} />
       <Grid container spacing={3} style={{ width: "100%" }}>
         <Grid item xs={12} md={4}>
           <List
