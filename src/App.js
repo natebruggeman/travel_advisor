@@ -11,6 +11,8 @@ const App = () => {
   const [places, setPlaces] = useState([]);
   const [childClicked, setChildClicked] = useState(null);
 
+  const [filteredPlaces, setFilteredPlaces] = useState([]);
+
   const [coords, setCoordinates] = useState({});
   const [bounds, setBounds] = useState({});
 
@@ -18,6 +20,7 @@ const App = () => {
   const [type, setType] = useState("restaurants");
   const [rating, setRating] = useState(" ");
 
+  //useEffect for altering the google maps position
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
@@ -29,10 +32,18 @@ const App = () => {
     );
   }, []);
 
+  //rating useEffect
+  useEffect(() => {
+    const filteredPlaces = places.filter((place) => place.rating > rating);
+    setFilteredPlaces(filteredPlaces);
+  }, [rating]);
+
+  //useEffect for altering type of restaruant, attraction, or hotel
   useEffect(() => {
     setIsLoading(true);
     getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
       setPlaces(data);
+      setFilteredPlaces([]);
       setIsLoading(false);
     });
   }, [type, coords, bounds]);
@@ -44,7 +55,8 @@ const App = () => {
       <Grid container spacing={3} style={{ width: "100%" }}>
         <Grid item xs={12} md={4}>
           <List
-            places={places}
+            places={filteredPlaces.length ? filteredPlaces : places}
+            //if we're filtering places, render them otherwise render all places.
             childClicked={childClicked}
             isLoading={isLoading}
             type={type}
@@ -58,7 +70,8 @@ const App = () => {
             setCoordinates={setCoordinates}
             setBounds={setBounds}
             coords={coords}
-            places={places}
+            places={filteredPlaces.length ? filteredPlaces : places}
+            //if we're filtering places, render them otherwise render all places.
             setChildClicked={setChildClicked}
           />
         </Grid>
