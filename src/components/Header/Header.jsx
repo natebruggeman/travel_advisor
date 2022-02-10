@@ -24,7 +24,7 @@ const Header = () => {
             </div>
             <InputBase
               placeholder="Search..."
-              classes={{ root: classes.inpuRoot, input: classes.inputInput }}
+              classes={{ root: classes.inputRoot, input: classes.inputInput }}
             />
           </div>
           {/* </Autocomplete> */}
